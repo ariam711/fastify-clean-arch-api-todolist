@@ -102,7 +102,7 @@ export function errorHandler(error: FastifyError | Error, request: FastifyReques
   reply.status(500).send({
     error: {
       code: 'INTERNAL_SERVER_ERROR',
-      message: process.env['NODE_ENV'] === 'production' ? 'An unexpected error occurred' : error.message,
+      message: process.env.NODE_ENV === 'production' ? 'An unexpected error occurred' : error.message,
     },
   } satisfies ErrorResponse);
 }

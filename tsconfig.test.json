@@ -1,34 +1,18 @@
 {
-    "extends": "./tsconfig.json",
-    "compilerOptions": {
-        "rootDir": ".",
-        "outDir": "./dist-tests",
-        "noEmit": true,
-        "baseUrl": ".",
-        "paths": {
-            "@app/*": [
-                "src/application/*"
-            ],
-            "@config/*": [
-                "src/config/*"
-            ],
-            "@domain/*": [
-                "src/domain/*"
-            ],
-            "@infra/*": [
-                "src/infrastructure/*"
-            ],
-            "@interface/*": [
-                "src/interfaces/*"
-            ]
-        }
-    },
-    "include": [
-        "src/**/*",
-        "tests/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "./dist-tests",
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/application/*"],
+      "@config/*": ["src/config/*"],
+      "@domain/*": ["src/domain/*"],
+      "@infra/*": ["src/infrastructure/*"],
+      "@interface/*": ["src/interfaces/*"]
+    }
+  },
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
