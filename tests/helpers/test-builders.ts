@@ -5,7 +5,7 @@ import type { TaskPriority, TaskStatus } from '../../src/domain/types/index.js';
 
 // Project Builder
 export class ProjectBuilder {
-  private props = {
+  private props: { name: string; description?: string } = {
     name: 'Test Project',
     description: 'A test project description',
   };
