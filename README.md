@@ -1,6 +1,10 @@
 # TODO List REST API
 
-Production-ready TODO List REST API built with **Fastify + MongoDB** using **Clean Architecture** principles.
+Production-ready TODO List REST API built with **Fastify + MongoDB** using **Clean Architecture**, **SOLID**, and **DRY** principles.
+
+> [!TIP]
+> **New to the project?** Check out our comprehensive [Architecture Guide](./docs/ARCHITECTURE_GUIDE.md) for a deep dive into the design principles, request flows, and a step-by-step tutorial on adding new features.
+
 
 ## Features
 
