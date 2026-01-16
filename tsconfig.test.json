@@ -3,7 +3,25 @@
     "compilerOptions": {
         "rootDir": ".",
         "outDir": "./dist-tests",
-        "noEmit": true
+        "noEmit": true,
+        "baseUrl": ".",
+        "paths": {
+            "@app/*": [
+                "src/application/*"
+            ],
+            "@config/*": [
+                "src/config/*"
+            ],
+            "@domain/*": [
+                "src/domain/*"
+            ],
+            "@infra/*": [
+                "src/infrastructure/*"
+            ],
+            "@interface/*": [
+                "src/interfaces/*"
+            ]
+        }
     },
     "include": [
         "src/**/*",
