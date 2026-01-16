@@ -1,7 +1,7 @@
-import { BusinessRuleViolationError, ValidationError } from '../errors/domain-errors.js';
-import { Entity } from '../shared/entity.js';
-import type { TaskPriority, TaskStatus } from '../types/index.js';
-import { TASK_PRIORITIES, TASK_STATUSES } from '../types/index.js';
+import { BusinessRuleViolationError, ValidationError } from '@domain/errors/domain-errors.js';
+import { Entity } from '@domain/shared/entity.js';
+import type { TaskPriority, TaskStatus } from '@domain/types/index.js';
+import { TASK_PRIORITIES, TASK_STATUSES } from '@domain/types/index.js';
 
 export interface TaskProps {
   title: string;

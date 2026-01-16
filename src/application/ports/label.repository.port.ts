@@ -1,5 +1,5 @@
-import type { Label } from '../../domain/entities/label.entity.js';
-import type { OffsetPaginatedResult, OffsetPaginationParams } from '../../domain/types/index.js';
+import type { Label } from '@domain/entities/label.entity.js';
+import type { OffsetPaginatedResult, OffsetPaginationParams } from '@domain/types/index.js';
 
 export interface LabelRepositoryPort {
   create(label: Label): Promise<Label>;

@@ -6,7 +6,7 @@ import type {
   GetProjectUseCase,
   ListProjectsUseCase,
   UpdateProjectUseCase,
-} from '../../../application/use-cases/project/index.js';
+} from '@app/use-cases/project/index.js';
 import {
   type CreateProjectBody,
   CreateProjectBodySchema,
@@ -20,7 +20,7 @@ import {
   ProjectResponseSchema,
   type UpdateProjectBody,
   UpdateProjectBodySchema,
-} from '../dtos/project.dto.js';
+} from '@interface/http/dtos/project.dto.js';
 
 function formatProjectResponse(project: {
   id: string;

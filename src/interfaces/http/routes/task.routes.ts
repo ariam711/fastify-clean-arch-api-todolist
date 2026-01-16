@@ -6,9 +6,9 @@ import type {
   GetTaskUseCase,
   ListTasksUseCase,
   UpdateTaskUseCase,
-} from '../../../application/use-cases/task/index.js';
-import type { TaskPriority, TaskStatus } from '../../../domain/types/index.js';
-import { type IdParams, IdParamsSchema } from '../dtos/project.dto.js';
+} from '@app/use-cases/task/index.js';
+import type { TaskPriority, TaskStatus } from '@domain/types/index.js';
+import { type IdParams, IdParamsSchema } from '@interface/http/dtos/project.dto.js';
 import {
   type CreateTaskBody,
   CreateTaskBodySchema,
@@ -18,7 +18,7 @@ import {
   TaskResponseSchema,
   type UpdateTaskBody,
   UpdateTaskBodySchema,
-} from '../dtos/task.dto.js';
+} from '@interface/http/dtos/task.dto.js';
 
 function formatTaskResponse(task: {
   id: string;

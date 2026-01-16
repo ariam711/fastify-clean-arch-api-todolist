@@ -7,7 +7,7 @@ import {
   GetLabelUseCase,
   ListLabelsUseCase,
   UpdateLabelUseCase,
-} from '../../application/use-cases/label/index.js';
+} from '@app/use-cases/label/index.js';
 // Project Use Cases
 import {
   CreateProjectUseCase,
@@ -15,7 +15,7 @@ import {
   GetProjectUseCase,
   ListProjectsUseCase,
   UpdateProjectUseCase,
-} from '../../application/use-cases/project/index.js';
+} from '@app/use-cases/project/index.js';
 // Task Use Cases
 import {
   CreateTaskUseCase,
@@ -23,11 +23,11 @@ import {
   GetTaskUseCase,
   ListTasksUseCase,
   UpdateTaskUseCase,
-} from '../../application/use-cases/task/index.js';
-import { LabelRepository } from '../../infrastructure/repositories/label.repository.js';
+} from '@app/use-cases/task/index.js';
+import { LabelRepository } from '@infra/repositories/label.repository.js';
 // Repositories
-import { ProjectRepository } from '../../infrastructure/repositories/project.repository.js';
-import { TaskRepository } from '../../infrastructure/repositories/task.repository.js';
+import { ProjectRepository } from '@infra/repositories/project.repository.js';
+import { TaskRepository } from '@infra/repositories/task.repository.js';
 
 export interface ContainerDependencies {
   db: Db;

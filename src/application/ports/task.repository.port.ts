@@ -1,11 +1,11 @@
-import type { Task } from '../../domain/entities/task.entity.js';
+import type { Task } from '@domain/entities/task.entity.js';
 import type {
   PaginatedResult,
   PaginationParams,
   SortParams,
   TaskPriority,
   TaskStatus,
-} from '../../domain/types/index.js';
+} from '@domain/types/index.js';
 
 export interface TaskFilterParams {
   projectId?: string;

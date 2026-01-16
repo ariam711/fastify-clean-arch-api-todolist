@@ -5,7 +5,7 @@ import {
   DomainError,
   NotFoundError,
   ValidationError,
-} from '../../../domain/errors/domain-errors.js';
+} from '@domain/errors/domain-errors.js';
 
 interface ErrorResponse {
   error: {

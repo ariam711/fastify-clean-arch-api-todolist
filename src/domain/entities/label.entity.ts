@@ -1,5 +1,5 @@
-import { ValidationError } from '../errors/domain-errors.js';
-import { Entity } from '../shared/entity.js';
+import { ValidationError } from '@domain/errors/domain-errors.js';
+import { Entity } from '@domain/shared/entity.js';
 
 export interface LabelProps {
   name: string;

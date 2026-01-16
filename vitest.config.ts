@@ -39,11 +39,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@domain': path.resolve(__dirname, './src/domain'),
-      '@application': path.resolve(__dirname, './src/application'),
-      '@infrastructure': path.resolve(__dirname, './src/infrastructure'),
-      '@interfaces': path.resolve(__dirname, './src/interfaces'),
+      '@app': path.resolve(__dirname, './src/application'),
       '@config': path.resolve(__dirname, './src/config'),
+      '@domain': path.resolve(__dirname, './src/domain'),
+      '@infra': path.resolve(__dirname, './src/infrastructure'),
+      '@interface': path.resolve(__dirname, './src/interfaces'),
       '@tests': path.resolve(__dirname, './tests'),
     },
   },

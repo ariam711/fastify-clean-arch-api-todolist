@@ -1,5 +1,5 @@
-import type { Project } from '../../domain/entities/project.entity.js';
-import type { OffsetPaginatedResult, OffsetPaginationParams } from '../../domain/types/index.js';
+import type { Project } from '@domain/entities/project.entity.js';
+import type { OffsetPaginatedResult, OffsetPaginationParams } from '@domain/types/index.js';
 
 export interface ProjectRepositoryPort {
   create(project: Project): Promise<Project>;

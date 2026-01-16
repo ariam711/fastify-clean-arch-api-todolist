@@ -1,5 +1,5 @@
 import type { Document, WithId } from 'mongodb';
-import { Label, type LabelProps } from '../../domain/entities/label.entity.js';
+import { Label, type LabelProps } from '@domain/entities/label.entity.js';
 
 export interface LabelDocument extends Document {
   _id: string;

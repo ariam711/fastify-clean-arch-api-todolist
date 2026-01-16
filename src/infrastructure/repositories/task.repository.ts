@@ -3,10 +3,10 @@ import type {
   ListTasksParams,
   TaskFilterParams,
   TaskRepositoryPort,
-} from '../../application/ports/task.repository.port.js';
-import type { Task } from '../../domain/entities/task.entity.js';
-import type { PaginatedResult } from '../../domain/types/index.js';
-import { type TaskDocument, TaskMapper } from '../mappers/task.mapper.js';
+} from '@app/ports/task.repository.port.js';
+import type { Task } from '@domain/entities/task.entity.js';
+import type { PaginatedResult } from '@domain/types/index.js';
+import { type TaskDocument, TaskMapper } from '@infra/mappers/task.mapper.js';
 
 export class TaskRepository implements TaskRepositoryPort {
   private readonly collection: Collection<TaskDocument>;

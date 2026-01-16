@@ -1,7 +1,7 @@
-import { BusinessRuleViolationError, NotFoundError } from '../../../domain/errors/domain-errors.js';
-import type { LabelRepositoryPort } from '../../ports/label.repository.port.js';
-import type { ProjectRepositoryPort } from '../../ports/project.repository.port.js';
-import type { TaskRepositoryPort } from '../../ports/task.repository.port.js';
+import { BusinessRuleViolationError, NotFoundError } from '@domain/errors/domain-errors.js';
+import type { LabelRepositoryPort } from '@app/ports/label.repository.port.js';
+import type { ProjectRepositoryPort } from '@app/ports/project.repository.port.js';
+import type { TaskRepositoryPort } from '@app/ports/task.repository.port.js';
 
 export interface DeleteProjectCommand {
   id: string;

@@ -6,7 +6,7 @@ import type {
   GetLabelUseCase,
   ListLabelsUseCase,
   UpdateLabelUseCase,
-} from '../../../application/use-cases/label/index.js';
+} from '@app/use-cases/label/index.js';
 import {
   type CreateLabelBody,
   CreateLabelBodySchema,
@@ -16,8 +16,8 @@ import {
   ListLabelsQuerySchema,
   type UpdateLabelBody,
   UpdateLabelBodySchema,
-} from '../dtos/label.dto.js';
-import { type IdParams, IdParamsSchema } from '../dtos/project.dto.js';
+} from '@interface/http/dtos/label.dto.js';
+import { type IdParams, IdParamsSchema } from '@interface/http/dtos/project.dto.js';
 
 function formatLabelResponse(label: { id: string; name: string; color: string; projectId: string; createdAt: Date }) {
   return {

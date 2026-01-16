@@ -1,8 +1,8 @@
 import type { Collection, Db } from 'mongodb';
-import type { ProjectRepositoryPort } from '../../application/ports/project.repository.port.js';
-import type { Project } from '../../domain/entities/project.entity.js';
-import type { OffsetPaginatedResult, OffsetPaginationParams } from '../../domain/types/index.js';
-import { type ProjectDocument, ProjectMapper } from '../mappers/project.mapper.js';
+import type { ProjectRepositoryPort } from '@app/ports/project.repository.port.js';
+import type { Project } from '@domain/entities/project.entity.js';
+import type { OffsetPaginatedResult, OffsetPaginationParams } from '@domain/types/index.js';
+import { type ProjectDocument, ProjectMapper } from '@infra/mappers/project.mapper.js';
 
 export class ProjectRepository implements ProjectRepositoryPort {
   private readonly collection: Collection<ProjectDocument>;

@@ -1,9 +1,9 @@
-import { Task } from '../../../domain/entities/task.entity.js';
-import { NotFoundError } from '../../../domain/errors/domain-errors.js';
-import type { TaskPriority, TaskStatus } from '../../../domain/types/index.js';
-import type { LabelRepositoryPort } from '../../ports/label.repository.port.js';
-import type { ProjectRepositoryPort } from '../../ports/project.repository.port.js';
-import type { TaskRepositoryPort } from '../../ports/task.repository.port.js';
+import { Task } from '@domain/entities/task.entity.js';
+import { NotFoundError } from '@domain/errors/domain-errors.js';
+import type { TaskPriority, TaskStatus } from '@domain/types/index.js';
+import type { LabelRepositoryPort } from '@app/ports/label.repository.port.js';
+import type { ProjectRepositoryPort } from '@app/ports/project.repository.port.js';
+import type { TaskRepositoryPort } from '@app/ports/task.repository.port.js';
 
 export interface CreateTaskCommand {
   title: string;
