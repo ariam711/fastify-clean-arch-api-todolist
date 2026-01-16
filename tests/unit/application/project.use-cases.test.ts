@@ -1,13 +1,13 @@
+import type { LabelRepositoryPort } from '@app/ports/label.repository.port.js';
+import type { ProjectRepositoryPort } from '@app/ports/project.repository.port.js';
+import type { TaskRepositoryPort } from '@app/ports/task.repository.port.js';
+import { CreateProjectUseCase } from '@app/use-cases/project/create-project.use-case.js';
+import { DeleteProjectUseCase } from '@app/use-cases/project/delete-project.use-case.js';
+import { GetProjectUseCase } from '@app/use-cases/project/get-project.use-case.js';
+import { ListProjectsUseCase } from '@app/use-cases/project/list-projects.use-case.js';
+import { UpdateProjectUseCase } from '@app/use-cases/project/update-project.use-case.js';
+import { BusinessRuleViolationError, ConflictError, NotFoundError } from '@domain/errors/domain-errors.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { LabelRepositoryPort } from '../../../src/application/ports/label.repository.port.js';
-import type { ProjectRepositoryPort } from '../../../src/application/ports/project.repository.port.js';
-import type { TaskRepositoryPort } from '../../../src/application/ports/task.repository.port.js';
-import { CreateProjectUseCase } from '../../../src/application/use-cases/project/create-project.use-case.js';
-import { DeleteProjectUseCase } from '../../../src/application/use-cases/project/delete-project.use-case.js';
-import { GetProjectUseCase } from '../../../src/application/use-cases/project/get-project.use-case.js';
-import { ListProjectsUseCase } from '../../../src/application/use-cases/project/list-projects.use-case.js';
-import { UpdateProjectUseCase } from '../../../src/application/use-cases/project/update-project.use-case.js';
-import { BusinessRuleViolationError, ConflictError, NotFoundError } from '../../../src/domain/errors/domain-errors.js';
 import { createProject } from '../../helpers/test-builders.js';
 
 const createMockProjectRepository = (): ProjectRepositoryPort => ({

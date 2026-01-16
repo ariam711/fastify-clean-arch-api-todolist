@@ -1,3 +1,4 @@
+import { env } from '@config/env.js';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import swagger from '@fastify/swagger';
@@ -5,8 +6,6 @@ import swaggerUi from '@fastify/swagger-ui';
 import type { AwilixContainer } from 'awilix';
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { Db } from 'mongodb';
-
-import { env } from '@config/env.js';
 import { createDIContainer } from './container.js';
 import { correlationIdHook, correlationIdResponseHook, errorHandler } from './middleware/index.js';
 import { labelRoutes, projectRoutes, taskRoutes } from './routes/index.js';

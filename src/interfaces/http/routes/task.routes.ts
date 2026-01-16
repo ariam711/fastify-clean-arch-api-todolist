@@ -1,5 +1,3 @@
-import type { AwilixContainer } from 'awilix';
-import type { FastifyInstance } from 'fastify';
 import type {
   CreateTaskUseCase,
   DeleteTaskUseCase,
@@ -19,6 +17,8 @@ import {
   type UpdateTaskBody,
   UpdateTaskBodySchema,
 } from '@interface/http/dtos/task.dto.js';
+import type { AwilixContainer } from 'awilix';
+import type { FastifyInstance } from 'fastify';
 
 function formatTaskResponse(task: {
   id: string;

@@ -1,12 +1,8 @@
-import type { Collection, Db, Filter, Sort } from 'mongodb';
-import type {
-  ListTasksParams,
-  TaskFilterParams,
-  TaskRepositoryPort,
-} from '@app/ports/task.repository.port.js';
+import type { ListTasksParams, TaskFilterParams, TaskRepositoryPort } from '@app/ports/task.repository.port.js';
 import type { Task } from '@domain/entities/task.entity.js';
 import type { PaginatedResult } from '@domain/types/index.js';
 import { type TaskDocument, TaskMapper } from '@infra/mappers/task.mapper.js';
+import type { Collection, Db, Filter, Sort } from 'mongodb';
 
 export class TaskRepository implements TaskRepositoryPort {
   private readonly collection: Collection<TaskDocument>;

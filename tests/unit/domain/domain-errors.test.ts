@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
 import {
   BusinessRuleViolationError,
   ConflictError,
   NotFoundError,
   ValidationError,
-} from '../../../src/domain/errors/domain-errors.js';
+} from '@domain/errors/domain-errors.js';
+import { describe, expect, it } from 'vitest';
 
 describe('Domain Errors', () => {
   describe('ValidationError', () => {

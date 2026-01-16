@@ -1,5 +1,3 @@
-import { type AwilixContainer, asClass, asValue, createContainer, InjectionMode } from 'awilix';
-import type { Db } from 'mongodb';
 // Label Use Cases
 import {
   CreateLabelUseCase,
@@ -28,6 +26,8 @@ import { LabelRepository } from '@infra/repositories/label.repository.js';
 // Repositories
 import { ProjectRepository } from '@infra/repositories/project.repository.js';
 import { TaskRepository } from '@infra/repositories/task.repository.js';
+import { type AwilixContainer, asClass, asValue, createContainer, InjectionMode } from 'awilix';
+import type { Db } from 'mongodb';
 
 export interface ContainerDependencies {
   db: Db;

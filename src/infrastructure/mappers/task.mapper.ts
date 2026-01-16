@@ -1,6 +1,6 @@
-import type { Document, WithId } from 'mongodb';
 import { Task, type TaskProps } from '@domain/entities/task.entity.js';
 import type { TaskPriority, TaskStatus } from '@domain/types/index.js';
+import type { Document, WithId } from 'mongodb';
 
 export interface TaskDocument extends Document {
   _id: string;

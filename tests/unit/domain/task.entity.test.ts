@@ -1,6 +1,6 @@
+import { Task } from '@domain/entities/task.entity.js';
+import { BusinessRuleViolationError, ValidationError } from '@domain/errors/domain-errors.js';
 import { describe, expect, it } from 'vitest';
-import { Task } from '../../../src/domain/entities/task.entity.js';
-import { BusinessRuleViolationError, ValidationError } from '../../../src/domain/errors/domain-errors.js';
 
 describe('Task Entity', () => {
   const futureDate = new Date(Date.now() + 86400000); // Tomorrow

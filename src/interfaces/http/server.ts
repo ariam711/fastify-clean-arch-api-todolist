@@ -1,6 +1,6 @@
-import type { FastifyInstance } from 'fastify';
 import { env } from '@config/env.js';
 import { connectToDatabase, disconnectFromDatabase } from '@infra/database/mongodb.connection.js';
+import type { FastifyInstance } from 'fastify';
 import { buildApp } from './app.js';
 
 async function start(): Promise<void> {

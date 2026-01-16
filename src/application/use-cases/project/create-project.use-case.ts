@@ -1,6 +1,6 @@
+import type { ProjectRepositoryPort } from '@app/ports/project.repository.port.js';
 import { Project } from '@domain/entities/project.entity.js';
 import { ConflictError } from '@domain/errors/domain-errors.js';
-import type { ProjectRepositoryPort } from '@app/ports/project.repository.port.js';
 
 export interface CreateProjectCommand {
   name: string;

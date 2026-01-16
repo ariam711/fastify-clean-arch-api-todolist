@@ -1,5 +1,5 @@
-import { NotFoundError } from '@domain/errors/domain-errors.js';
 import type { LabelRepositoryPort } from '@app/ports/label.repository.port.js';
+import { NotFoundError } from '@domain/errors/domain-errors.js';
 
 export interface DeleteLabelCommand {
   id: string;

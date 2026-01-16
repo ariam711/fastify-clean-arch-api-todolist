@@ -1,4 +1,3 @@
-import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
 import {
   BusinessRuleViolationError,
   ConflictError,
@@ -6,6 +5,7 @@ import {
   NotFoundError,
   ValidationError,
 } from '@domain/errors/domain-errors.js';
+import type { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
 
 interface ErrorResponse {
   error: {

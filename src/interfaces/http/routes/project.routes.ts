@@ -1,5 +1,3 @@
-import type { AwilixContainer } from 'awilix';
-import type { FastifyInstance } from 'fastify';
 import type {
   CreateProjectUseCase,
   DeleteProjectUseCase,
@@ -21,6 +19,8 @@ import {
   type UpdateProjectBody,
   UpdateProjectBodySchema,
 } from '@interface/http/dtos/project.dto.js';
+import type { AwilixContainer } from 'awilix';
+import type { FastifyInstance } from 'fastify';
 
 function formatProjectResponse(project: {
   id: string;

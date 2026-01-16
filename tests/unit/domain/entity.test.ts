@@ -1,5 +1,5 @@
+import { Entity } from '@domain/shared/entity.js';
 import { describe, expect, it } from 'vitest';
-import { Entity } from '../../../src/domain/shared/entity.js';
 
 // Concrete implementation for testing abstract Entity class
 interface TestProps {

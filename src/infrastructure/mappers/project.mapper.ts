@@ -1,5 +1,5 @@
-import type { Document, WithId } from 'mongodb';
 import { Project, type ProjectProps } from '@domain/entities/project.entity.js';
+import type { Document, WithId } from 'mongodb';
 
 export interface ProjectDocument extends Document {
   _id: string;

@@ -1,8 +1,8 @@
-import type { Collection, Db } from 'mongodb';
 import type { LabelRepositoryPort } from '@app/ports/label.repository.port.js';
 import type { Label } from '@domain/entities/label.entity.js';
 import type { OffsetPaginatedResult, OffsetPaginationParams } from '@domain/types/index.js';
 import { type LabelDocument, LabelMapper } from '@infra/mappers/label.mapper.js';
+import type { Collection, Db } from 'mongodb';
 
 export class LabelRepository implements LabelRepositoryPort {
   private readonly collection: Collection<LabelDocument>;

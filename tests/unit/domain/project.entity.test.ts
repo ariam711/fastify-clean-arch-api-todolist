@@ -1,6 +1,6 @@
+import { Project } from '@domain/entities/project.entity.js';
+import { ValidationError } from '@domain/errors/domain-errors.js';
 import { describe, expect, it } from 'vitest';
-import { Project } from '../../../src/domain/entities/project.entity.js';
-import { ValidationError } from '../../../src/domain/errors/domain-errors.js';
 
 describe('Project Entity', () => {
   describe('create', () => {

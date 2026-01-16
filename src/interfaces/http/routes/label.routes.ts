@@ -1,5 +1,3 @@
-import type { AwilixContainer } from 'awilix';
-import type { FastifyInstance } from 'fastify';
 import type {
   CreateLabelUseCase,
   DeleteLabelUseCase,
@@ -18,6 +16,8 @@ import {
   UpdateLabelBodySchema,
 } from '@interface/http/dtos/label.dto.js';
 import { type IdParams, IdParamsSchema } from '@interface/http/dtos/project.dto.js';
+import type { AwilixContainer } from 'awilix';
+import type { FastifyInstance } from 'fastify';
 
 function formatLabelResponse(label: { id: string; name: string; color: string; projectId: string; createdAt: Date }) {
   return {

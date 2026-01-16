@@ -1,13 +1,13 @@
+import type { LabelRepositoryPort } from '@app/ports/label.repository.port.js';
+import type { ProjectRepositoryPort } from '@app/ports/project.repository.port.js';
+import type { TaskRepositoryPort } from '@app/ports/task.repository.port.js';
+import { CreateTaskUseCase } from '@app/use-cases/task/create-task.use-case.js';
+import { DeleteTaskUseCase } from '@app/use-cases/task/delete-task.use-case.js';
+import { GetTaskUseCase } from '@app/use-cases/task/get-task.use-case.js';
+import { ListTasksUseCase } from '@app/use-cases/task/list-tasks.use-case.js';
+import { UpdateTaskUseCase } from '@app/use-cases/task/update-task.use-case.js';
+import { NotFoundError } from '@domain/errors/domain-errors.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { LabelRepositoryPort } from '../../../src/application/ports/label.repository.port.js';
-import type { ProjectRepositoryPort } from '../../../src/application/ports/project.repository.port.js';
-import type { TaskRepositoryPort } from '../../../src/application/ports/task.repository.port.js';
-import { CreateTaskUseCase } from '../../../src/application/use-cases/task/create-task.use-case.js';
-import { DeleteTaskUseCase } from '../../../src/application/use-cases/task/delete-task.use-case.js';
-import { GetTaskUseCase } from '../../../src/application/use-cases/task/get-task.use-case.js';
-import { ListTasksUseCase } from '../../../src/application/use-cases/task/list-tasks.use-case.js';
-import { UpdateTaskUseCase } from '../../../src/application/use-cases/task/update-task.use-case.js';
-import { NotFoundError } from '../../../src/domain/errors/domain-errors.js';
 import { createLabel, createProject, createTask } from '../../helpers/test-builders.js';
 
 const createMockTaskRepository = (): TaskRepositoryPort => ({

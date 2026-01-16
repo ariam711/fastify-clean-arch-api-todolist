@@ -1,12 +1,12 @@
+import type { LabelRepositoryPort } from '@app/ports/label.repository.port.js';
+import type { ProjectRepositoryPort } from '@app/ports/project.repository.port.js';
+import { CreateLabelUseCase } from '@app/use-cases/label/create-label.use-case.js';
+import { DeleteLabelUseCase } from '@app/use-cases/label/delete-label.use-case.js';
+import { GetLabelUseCase } from '@app/use-cases/label/get-label.use-case.js';
+import { ListLabelsUseCase } from '@app/use-cases/label/list-labels.use-case.js';
+import { UpdateLabelUseCase } from '@app/use-cases/label/update-label.use-case.js';
+import { ConflictError, NotFoundError } from '@domain/errors/domain-errors.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { LabelRepositoryPort } from '../../../src/application/ports/label.repository.port.js';
-import type { ProjectRepositoryPort } from '../../../src/application/ports/project.repository.port.js';
-import { CreateLabelUseCase } from '../../../src/application/use-cases/label/create-label.use-case.js';
-import { DeleteLabelUseCase } from '../../../src/application/use-cases/label/delete-label.use-case.js';
-import { GetLabelUseCase } from '../../../src/application/use-cases/label/get-label.use-case.js';
-import { ListLabelsUseCase } from '../../../src/application/use-cases/label/list-labels.use-case.js';
-import { UpdateLabelUseCase } from '../../../src/application/use-cases/label/update-label.use-case.js';
-import { ConflictError, NotFoundError } from '../../../src/domain/errors/domain-errors.js';
 import { createLabel, createProject } from '../../helpers/test-builders.js';
 
 const createMockLabelRepository = (): LabelRepositoryPort => ({

@@ -1,6 +1,6 @@
+import type { TaskRepositoryPort } from '@app/ports/task.repository.port.js';
 import type { Task } from '@domain/entities/task.entity.js';
 import { NotFoundError } from '@domain/errors/domain-errors.js';
-import type { TaskRepositoryPort } from '@app/ports/task.repository.port.js';
 
 export interface GetTaskQuery {
   id: string;

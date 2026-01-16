@@ -1,6 +1,6 @@
+import type { LabelRepositoryPort } from '@app/ports/label.repository.port.js';
 import type { Label } from '@domain/entities/label.entity.js';
 import { NotFoundError } from '@domain/errors/domain-errors.js';
-import type { LabelRepositoryPort } from '@app/ports/label.repository.port.js';
 
 export interface GetLabelQuery {
   id: string;

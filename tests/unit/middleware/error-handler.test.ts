@@ -1,12 +1,12 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
-import { describe, expect, it, vi } from 'vitest';
 import {
   BusinessRuleViolationError,
   ConflictError,
   NotFoundError,
   ValidationError,
-} from '../../../src/domain/errors/domain-errors.js';
-import { errorHandler } from '../../../src/interfaces/http/middleware/error-handler.js';
+} from '@domain/errors/domain-errors.js';
+import { errorHandler } from '@interface/http/middleware/error-handler.js';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { describe, expect, it, vi } from 'vitest';
 
 describe('Error Handler Middleware', () => {
   const createMockRequest = (): FastifyRequest =>

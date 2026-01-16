@@ -1,6 +1,6 @@
+import { Label } from '@domain/entities/label.entity.js';
+import { ValidationError } from '@domain/errors/domain-errors.js';
 import { describe, expect, it } from 'vitest';
-import { Label } from '../../../src/domain/entities/label.entity.js';
-import { ValidationError } from '../../../src/domain/errors/domain-errors.js';
 
 describe('Label Entity', () => {
   describe('create', () => {

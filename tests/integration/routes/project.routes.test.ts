@@ -1,6 +1,6 @@
+import { buildApp } from '@interface/http/app.js';
 import type { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { buildApp } from '../../../src/interfaces/http/app.js';
 import { clearTestDatabase, startTestDatabase, stopTestDatabase } from '../../helpers/test-db.js';
 
 describe('Project Routes Integration', () => {

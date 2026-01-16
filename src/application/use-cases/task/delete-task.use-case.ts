@@ -1,5 +1,5 @@
-import { NotFoundError } from '@domain/errors/domain-errors.js';
 import type { TaskRepositoryPort } from '@app/ports/task.repository.port.js';
+import { NotFoundError } from '@domain/errors/domain-errors.js';
 
 export interface DeleteTaskCommand {
   id: string;

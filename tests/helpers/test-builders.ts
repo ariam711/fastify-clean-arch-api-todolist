@@ -1,7 +1,7 @@
-import { Label } from '../../src/domain/entities/label.entity.js';
-import { Project } from '../../src/domain/entities/project.entity.js';
-import { Task } from '../../src/domain/entities/task.entity.js';
-import type { TaskPriority, TaskStatus } from '../../src/domain/types/index.js';
+import { Label } from '@domain/entities/label.entity.js';
+import { Project } from '@domain/entities/project.entity.js';
+import { Task } from '@domain/entities/task.entity.js';
+import type { TaskPriority, TaskStatus } from '@domain/types/index.js';
 
 // Project Builder
 export class ProjectBuilder {
