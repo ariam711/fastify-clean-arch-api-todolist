@@ -5,12 +5,16 @@
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Architecture Overview](#architecture-overview)
-3. [Layer Interactions](#layer-interactions)
-4. [Request Flow Diagrams](#request-flow-diagrams)
-5. [Adding a New CRUD Feature](#adding-a-new-crud-feature)
-6. [Best Practices](#best-practices)
-7. [Testing Strategy](#testing-strategy)
+2. [Core Principles](#core-principles)
+   - [Clean Architecture Fundamentals](#clean-architecture-fundamentals)
+   - [SOLID Principles in Practice](#solid-principles-in-practice)
+   - [DRY Principle](#dry-principle)
+3. [Architecture Overview](#architecture-overview)
+4. [Layer Interactions](#layer-interactions)
+5. [Request Flow Diagrams](#request-flow-diagrams)
+6. [Adding a New CRUD Feature](#adding-a-new-crud-feature)
+7. [Best Practices](#best-practices)
+8. [Testing Strategy](#testing-strategy)
 
 ---
 
@@ -27,6 +31,832 @@ This project follows **Clean Architecture** principles, ensuring:
 1. **Dependency Rule**: Dependencies point inward. Outer layers depend on inner layers, never the reverse.
 2. **Separation of Concerns**: Each layer has a single, well-defined responsibility.
 3. **Dependency Inversion**: High-level modules don't depend on low-level modules. Both depend on abstractions.
+
+---
+
+## Core Principles
+
+### Clean Architecture Fundamentals
+
+Clean Architecture is a software design philosophy that separates concerns into distinct layers, creating a system that is independent of frameworks, UI, databases, and external dependencies. Think of it like an onion with layers, where the innermost layer contains your business rules and the outer layers handle technical details.
+
+#### The Dependency Rule
+
+> **Source code dependencies must point only inward, toward higher-level policies.**
+
+This is the **golden rule** of Clean Architecture. Let's see what this means in practice:
+
+```mermaid
+graph LR
+    UI[👤 UI Layer<br/>Knows about Use Cases] -->|Depends on| UC[⚙️ Use Cases<br/>Knows about Entities]
+    DB[💾 Database<br/>Knows about Entities] -->|Depends on| UC
+    UC -->|Depends on| E[💎 Entities<br/>Knows nothing else]
+    
+    style E fill:#4ade80,stroke:#22c55e,stroke-width:3px,color:#000
+    style UC fill:#60a5fa,stroke:#3b82f6,stroke-width:2px,color:#000
+    style UI fill:#f472b6,stroke:#ec4899,stroke-width:2px,color:#000
+    style DB fill:#fbbf24,stroke:#f59e0b,stroke-width:2px,color:#000
+```
+
+**In Our Codebase:**
+
+```typescript
+// ✅ CORRECT: Route depends on Use Case
+// src/interfaces/http/routes/project.routes.ts
+import { CreateProjectUseCase } from '@app/use-cases/project/create-project.use-case.js';
+
+export async function projectRoutes(fastify: FastifyInstance) {
+  fastify.post('/', async (request) => {
+    const useCase = container.resolve<CreateProjectUseCase>('createProjectUseCase');
+    return useCase.execute(request.body);
+  });
+}
+```
+
+```typescript
+// ✅ CORRECT: Use Case depends on Domain Entity
+// src/application/use-cases/project/create-project.use-case.ts
+import { Project } from '@domain/entities/project.entity.js';
+import type { ProjectRepositoryPort } from '@app/ports/project.repository.port.js';
+
+export class CreateProjectUseCase {
+  constructor(private readonly projectRepository: ProjectRepositoryPort) {}
+  
+  async execute(command: CreateProjectCommand): Promise<Project> {
+    const project = Project.create(command); // Using domain entity
+    return this.projectRepository.create(project);
+  }
+}
+```
+
+```typescript
+// ❌ WRONG: Domain Entity should NOT depend on Use Case or Repository
+// Domain entities should be pure business logic with zero external dependencies
+```
+
+#### Layer Independence
+
+Each layer can be understood and tested independently:
+
+**Example: Testing Domain Logic**
+
+```typescript
+// tests/unit/domain/project.entity.test.ts
+// No database, no HTTP, no framework - just pure business logic
+import { Project } from '@domain/entities/project.entity.js';
+import { ValidationError } from '@domain/errors/domain-errors.js';
+
+describe('Project Entity', () => {
+  it('should enforce business rule: name cannot be empty', () => {
+    expect(() => Project.create({ name: '' })).toThrow(ValidationError);
+  });
+  
+  it('should allow valid project creation', () => {
+    const project = Project.create({ name: 'My Project' });
+    expect(project.name).toBe('My Project');
+  });
+});
+```
+
+**Why is this powerful?**
+- Tests run in milliseconds (no database or HTTP server needed)
+- Business rules are crystal clear
+- Changes to database or API don't break these tests
+
+#### Framework Independence
+
+Your business logic doesn't care about Fastify, MongoDB, or any framework.
+
+**Example: Switching Databases**
+
+If we wanted to switch from MongoDB to PostgreSQL, we would only need to:
+
+1. Create a new `PostgresProjectRepository` implementing `ProjectRepositoryPort`
+2. Update the DI container registration
+3. **Zero changes** to domain entities, use cases, or routes!
+
+```typescript
+// Old: MongoDB Implementation
+export class ProjectRepository implements ProjectRepositoryPort {
+  constructor(private readonly db: Db) {
+    this.collection = db.collection<ProjectDocument>('projects');
+  }
+  
+  async findById(id: string): Promise<Project | null> {
+    const doc = await this.collection.findOne({ _id: id });
+    return doc ? ProjectMapper.toDomain(doc) : null;
+  }
+}
+
+// New: PostgreSQL Implementation (future)
+export class PostgresProjectRepository implements ProjectRepositoryPort {
+  constructor(private readonly pool: Pool) {}
+  
+  async findById(id: string): Promise<Project | null> {
+    const result = await this.pool.query('SELECT * FROM projects WHERE id = $1', [id]);
+    return result.rows[0] ? ProjectMapper.toDomain(result.rows[0]) : null;
+  }
+}
+```
+
+**The interface (`ProjectRepositoryPort`) stays the same, so all use cases continue to work!**
+
+---
+
+### SOLID Principles in Practice
+
+SOLID is an acronym for five design principles that make software designs more understandable, flexible, and maintainable. Let's see each one in action with real examples from our codebase.
+
+#### S - Single Responsibility Principle (SRP)
+
+> **A class should have only one reason to change.**
+
+Each class should do one thing and do it well.
+
+**✅ Example: Use Case Classes**
+
+```typescript
+// src/application/use-cases/project/create-project.use-case.ts
+// This class has ONE job: Create a project
+export class CreateProjectUseCase {
+  constructor(private readonly projectRepository: ProjectRepositoryPort) {}
+
+  async execute(command: CreateProjectCommand): Promise<Project> {
+    // 1. Check for duplicates
+    const existing = await this.projectRepository.findByName(command.name);
+    if (existing) {
+      throw new ConflictError('Project', 'name', command.name);
+    }
+
+    // 2. Create entity
+    const project = Project.create(command);
+
+    // 3. Persist
+    return this.projectRepository.create(project);
+  }
+}
+```
+
+**Why is this good?**
+- If validation logic changes → modify the `Project` entity
+- If database logic changes → modify the repository
+- If business workflow changes → modify this use case
+- Each change has a clear, single location
+
+**❌ Counter-Example: God Class (What NOT to do)**
+
+```typescript
+// BAD: This class does too many things!
+class ProjectManager {
+  validateProject(data: any) { /* validation */ }
+  saveToDatabase(data: any) { /* database */ }
+  sendEmail(project: any) { /* email */ }
+  generateReport(project: any) { /* reporting */ }
+  // When validation changes, database changes, email changes, or reporting changes,
+  // this class needs to be modified - TOO MANY REASONS TO CHANGE!
+}
+```
+
+**More SRP Examples in Our Codebase:**
+
+```typescript
+// ✅ Each error class has single responsibility
+export class NotFoundError extends DomainError {
+  constructor(entityName: string, identifier: string) {
+    super(`${entityName} with identifier '${identifier}' not found`);
+  }
+}
+
+export class ValidationError extends DomainError {
+  constructor(message: string, public readonly field?: string) {
+    super(message);
+  }
+}
+
+// ✅ Mappers have single responsibility: transform data between layers
+export class ProjectMapper {
+  static toDomain(doc: WithId<ProjectDocument>): Project { /* ... */ }
+  static toDocument(project: Project): ProjectDocument { /* ... */ }
+}
+```
+
+#### O - Open/Closed Principle (OCP)
+
+> **Software entities should be open for extension, but closed for modification.**
+
+You should be able to add new functionality without changing existing code.
+
+**✅ Example: Repository Port Interface**
+
+```typescript
+// src/application/ports/project.repository.port.ts
+// This interface is CLOSED for modification
+export interface ProjectRepositoryPort {
+  create(project: Project): Promise<Project>;
+  findById(id: string): Promise<Project | null>;
+  findByName(name: string): Promise<Project | null>;
+  findAll(params: OffsetPaginationParams): Promise<OffsetPaginatedResult<Project>>;
+  update(project: Project): Promise<Project>;
+  delete(id: string): Promise<void>;
+}
+```
+
+**Adding New Implementation (OPEN for extension):**
+
+ ```typescript
+// MongoDB Implementation
+export class MongoProjectRepository implements ProjectRepositoryPort {
+  // Implementation using MongoDB
+}
+
+// Redis Cache Implementation (NEW - no changes to interface!)
+export class CachedProjectRepository implements ProjectRepositoryPort {
+  constructor(
+    private readonly mongoRepo: MongoProjectRepository,
+    private readonly cache: RedisClient
+  ) {}
+
+  async findById(id: string): Promise<Project | null> {
+    // Try cache first
+    const cached = await this.cache.get(`project:${id}`);
+    if (cached) return JSON.parse(cached);
+
+    // Fall back to MongoDB
+    const project = await this.mongoRepo.findById(id);
+    if (project) {
+      await this.cache.set(`project:${id}`, JSON.stringify(project));
+    }
+    return project;
+  }
+  
+  // ... implement other methods
+}
+```
+
+**Use cases don't need to change - they work with the interface!**
+
+**✅ Example: Error Handler Middleware**
+
+```typescript
+// src/interfaces/http/middleware/error-handler.ts
+// Easy to add new error types without modifying existing handlers
+export function errorHandler(
+  error: Error,
+  request: FastifyRequest,
+  reply: FastifyReply
+): void {
+  // Each error type is handled independently
+  if (error instanceof ValidationError) {
+    return reply.code(400).send({ /* ... */ });
+  }
+  
+  if (error instanceof NotFoundError) {
+    return reply.code(404).send({ /* ... */ });
+  }
+  
+  if (error instanceof ConflictError) {
+    return reply.code(409).send({ /* ... */ });
+  }
+  
+  // Adding new error type? Just add another if block!
+  if (error instanceof RateLimitError) {
+    return reply.code(429).send({ /* ... */ });
+  }
+  
+  // Default handler
+  return reply.code(500).send({ /* ... */ });
+}
+```
+
+#### L - Liskov Substitution Principle (LSP)
+
+> **Objects of a superclass should be replaceable with objects of its subclasses without breaking the application.**
+
+This means: if you have a base class/interface, any implementation should work the same way.
+
+**✅ Example: Repository Implementations**
+
+```typescript
+// Any class implementing ProjectRepositoryPort can be substituted
+class CreateProjectUseCase {
+  constructor(private readonly projectRepository: ProjectRepositoryPort) {}
+  
+  async execute(command: CreateProjectCommand): Promise<Project> {
+    // This works whether projectRepository is:
+    // - MongoProjectRepository
+    // - PostgresProjectRepository  
+    // - CachedProjectRepository
+    // - InMemoryProjectRepository (for testing!)
+    return this.projectRepository.create(Project.create(command));
+  }
+}
+```
+
+**All implementations follow the same contract:**
+
+```typescript
+// Production: MongoDB
+const mongoRepo = new MongoProjectRepository(db);
+
+// Testing: In-Memory (no database needed!)
+const testRepo = new InMemoryProjectRepository();
+
+// Both can be used interchangeably
+const useCase1 = new CreateProjectUseCase(mongoRepo);
+const useCase2 = new CreateProjectUseCase(testRepo);
+```
+
+**✅ Example: Domain Entities**
+
+```typescript
+// All entities extend base Entity class
+export abstract class Entity<T> {
+  protected constructor(
+    protected readonly props: T,
+    protected readonly _id: string = randomUUID()
+  ) {}
+
+  public get id(): string {
+    return this._id;
+  }
+
+  public equals(other: Entity<T>): boolean {
+    return this._id === other._id;
+  }
+}
+
+// Project, Task, and Label can all be treated as Entity
+const entities: Entity<any>[] = [
+  Project.create({ name: 'A' }),
+  Task.create({ title: 'B', projectId: '1' }),
+  Label.create({ name: 'C', color: '#fff', projectId: '1' })
+];
+
+entities.forEach(entity => {
+  console.log(entity.id); // Works for all!
+  if (entity.equals(otherEntity)) { /* ... */ } // Works for all!
+});
+```
+
+#### I - Interface Segregation Principle (ISP)
+
+> **Clients should not be forced to depend on interfaces they don't use.**
+
+Don't create fat interfaces. Split them into smaller, specific ones.
+
+**✅ Example: Focused Repository Ports**
+
+```typescript
+// src/application/ports/task.repository.port.ts
+// Separate, focused interfaces
+export interface TaskFilterParams {
+  projectId?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  labelIds?: string[];
+}
+
+export interface TaskRepositoryPort {
+  create(task: Task): Promise<Task>;
+  findById(id: string): Promise<Task | null>;
+  findAll(params: ListTasksParams): Promise<PaginatedResult<Task>>;
+  update(task: Task): Promise<Task>;
+  delete(id: string): Promise<void>;
+  deleteByProjectId(projectId: string): Promise<void>;
+  countOpenTasksByProjectId(projectId: string): Promise<number>;
+}
+```
+
+**Why this is good:**
+- Each method has a clear purpose
+- Mock only what you need in tests
+- Easy to understand what operations are available
+
+**❌ Counter-Example: Fat Interface (What NOT to do)**
+
+```typescript
+// BAD: Massive interface with methods not everyone needs
+interface MegaRepository {
+  // CRUD operations
+  create(entity: any): Promise<any>;
+  read(id: string): Promise<any>;
+  update(entity: any): Promise<any>;
+  delete(id: string): Promise<void>;
+  
+  // Reporting (not all repositories need this!)
+  generateMonthlyReport(): Promise<Report>;
+  exportToCSV(): Promise<string>;
+  
+  // Caching (not all repositories need this!)
+  invalidateCache(key: string): void;
+  warmUpCache(): Promise<void>;
+  
+  // Email (why is this in a repository?!)
+  sendNotificationEmail(to: string): Promise<void>;
+}
+
+// Now every implementation must implement ALL these methods,
+// even if they don't use them!
+```
+
+**✅ Example: Use Case Interfaces**
+
+```typescript
+// Each use case defines exactly what it needs
+export interface CreateProjectCommand {
+  name: string;
+  description?: string;
+}
+
+export interface UpdateProjectCommand {
+  id: string;
+  name?: string;
+  description?: string;
+}
+
+export interface ListProjectsQuery {
+  limit?: number;
+  offset?: number;
+}
+
+// Route handlers only provide what each use case needs
+fastify.post('/', async (request) => {
+  const useCase = container.resolve<CreateProjectUseCase>('createProjectUseCase');
+  // Only requires CreateProjectCommand - nothing more!
+  return useCase.execute(request.body);
+});
+```
+
+#### D - Dependency Inversion Principle (DIP)
+
+> **High-level modules should not depend on low-level modules. Both should depend on abstractions.**
+
+This is the **most important** principle for Clean Architecture. Your business logic should not depend on technical details.
+
+**✅ Example: Use Case Depends on Port (Abstraction)**
+
+```typescript
+// HIGH-LEVEL MODULE: Use Case
+// src/application/use-cases/project/delete-project.use-case.ts
+export class DeleteProjectUseCase {
+  constructor(
+    // ✅ Depends on abstraction (interface), not concrete implementation
+    private readonly projectRepository: ProjectRepositoryPort,
+    private readonly taskRepository: TaskRepositoryPort,
+    private readonly labelRepository: LabelRepositoryPort
+  ) {}
+
+  async execute(command: DeleteProjectCommand): Promise<void> {
+    const project = await this.projectRepository.findById(command.id);
+    if (!project) {
+      throw new NotFoundError('Project', command.id);
+    }
+
+    // Business rule: check for open tasks
+    if (!command.force) {
+      const openCount = await this.taskRepository.countOpenTasksByProjectId(command.id);
+      if (openCount > 0) {
+        throw new BusinessRuleViolationError(
+          `Cannot delete project with ${openCount} open task(s). Use force=true to delete anyway.`
+        );
+      }
+    }
+
+    // Clean up related data
+    await this.taskRepository.deleteByProjectId(command.id);
+    await this.labelRepository.deleteByProjectId(command.id);
+    await this.projectRepository.delete(command.id);
+  }
+}
+```
+
+**LOW-LEVEL MODULE: Repository Implementation**
+
+```typescript
+// src/infrastructure/repositories/project.repository.ts
+export class ProjectRepository implements ProjectRepositoryPort {
+  // ✅ Implements the abstraction defined by the high-level module
+  constructor(private readonly db: Db) {
+    this.collection = db.collection<ProjectDocument>('projects');
+  }
+
+  async findById(id: string): Promise<Project | null> {
+    // MongoDB-specific implementation details
+    const doc = await this.collection.findOne({ _id: id });
+    return doc ? ProjectMapper.toDomain(doc) : null;
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.collection.deleteOne({ _id: id });
+  }
+}
+```
+
+**Dependency Flow:**
+
+```mermaid
+graph TB
+    UseCase[DeleteProjectUseCase<br/>HIGH-LEVEL]
+    Port[ProjectRepositoryPort<br/>ABSTRACTION]
+    Impl[ProjectRepository<br/>LOW-LEVEL]
+    
+    UseCase -->|depends on| Port
+    Impl -->|implements| Port
+    
+    style Port fill:#a78bfa,stroke:#8b5cf6,color:#000
+    style UseCase fill:#60a5fa,stroke:#3b82f6,color:#000
+    style Impl fill:#fbbf24,stroke:#f59e0b,color:#000
+```
+
+**Benefits:**
+1. **Testability**: Inject mock repositories in tests
+2. **Flexibility**: Switch database without changing use cases
+3. **Separation**: Business logic and infrastructure are decoupled
+
+**Example: Testing with DIP**
+
+```typescript
+// tests/unit/application/project.use-cases.test.ts
+describe('DeleteProjectUseCase', () => {
+  it('should prevent deletion when project has open tasks', async () => {
+    // Create mock repositories (no real database!)
+    const mockProjectRepo = {
+      findById: vi.fn().mockResolvedValue(someProject),
+      delete: vi.fn(),
+    };
+    
+    const mockTaskRepo = {
+      countOpenTasksByProjectId: vi.fn().mockResolvedValue(5), // 5 open tasks!
+      deleteByProjectId: vi.fn(),
+    };
+
+    // Inject mocks
+    const useCase = new DeleteProjectUseCase(
+      mockProjectRepo as any,
+      mockTaskRepo as any,
+      mockLabelRepo as any
+    );
+
+    // Test business rule
+    await expect(
+      useCase.execute({ id: 'proj-1', force: false })
+    ).rejects.toThrow(BusinessRuleViolationError);
+  });
+});
+```
+
+---
+
+### DRY Principle
+
+> **Don't Repeat Yourself - Every piece of knowledge must have a single, unambiguous, authoritative representation within a system.**
+
+DRY doesn't mean "don't duplicate code." It means "don't duplicate knowledge/logic."
+
+#### Where We Apply DRY
+
+**✅ Example 1: Base Entity Class**
+
+Instead of duplicating ID and equality logic in every entity:
+
+```typescript
+// src/domain/shared/entity.ts
+// Single source of truth for entity identity
+export abstract class Entity<T> {
+  protected constructor(
+    protected readonly props: T,
+    protected readonly _id: string = randomUUID()
+  ) {}
+
+  public get id(): string {
+    return this._id;
+  }
+
+  public equals(other: Entity<T>): boolean {
+    if (!(other instanceof Entity)) {
+      return false;
+    }
+    return this._id === other._id;
+  }
+
+  protected get entityProps(): T {
+    return this.props;
+  }
+}
+```
+
+**All domain entities extend this:**
+
+```typescript
+// src/domain/entities/project.entity.ts
+export class Project extends Entity<ProjectProps> {
+  // No need to redefine id, equals, etc.
+  // Inherits identity logic from Entity
+}
+
+// src/domain/entities/task.entity.ts
+export class Task extends Entity<TaskProps> {
+  // No need to redefine id, equals, etc.
+  // Inherits identity logic from Entity
+}
+```
+
+**✅ Example 2: Shared Domain Errors**
+
+```typescript
+// src/domain/errors/domain-errors.ts
+// Single source of truth for error types
+export abstract class DomainError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+export class NotFoundError extends DomainError {
+  constructor(entityName: string, identifier: string) {
+    super(`${entityName} with identifier '${identifier}' not found`);
+  }
+}
+
+export class ValidationError extends DomainError {
+  constructor(message: string, public readonly field?: string) {
+    super(message);
+  }
+}
+```
+
+**Used consistently across all use cases:**
+
+```typescript
+// Instead of duplicating error creation:
+// throw new Error('Project with id XXX not found');
+// throw new Error('Task with id YYY not found');
+
+// We use consistent error types:
+throw new NotFoundError('Project', projectId);
+throw new NotFoundError('Task', taskId);
+throw new NotFoundError('Label', labelId);
+```
+
+**✅ Example 3: Mapper Pattern**
+
+All mappers follow the same pattern - no duplicated transformation logic:
+
+```typescript
+// Consistent pattern across all mappers
+export class ProjectMapper {
+  static toDomain(doc: WithId<ProjectDocument>): Project { /* ... */ }
+  static toDocument(project: Project): ProjectDocument { /* ... */ }
+}
+
+export class TaskMapper {
+  static toDomain(doc: WithId<TaskDocument>): Task { /* ... */ }
+  static toDocument(task: Task): TaskDocument { /* ... */ }
+}
+
+export class LabelMapper {
+  static toDomain(doc: WithId<LabelDocument>): Label { /* ... */ }
+  static toDocument(label: Label): LabelDocument { /* ... */ }
+}
+```
+
+**✅ Example 4: Pagination Types**
+
+```typescript
+// src/domain/types/index.ts
+// Single definition of pagination used everywhere
+export interface OffsetPaginationParams {
+  limit?: number;
+  offset?: number;
+}
+
+export interface OffsetPaginatedResult<T> {
+  data: T[];
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+}
+
+// Used in all repositories consistently:
+// - ProjectRepository.findAll()
+// - TaskRepository.findAll()
+// - LabelRepository.findByProjectId()
+```
+
+**✅ Example 5: Dependency Injection Container**
+
+```typescript
+// src/interfaces/http/container.ts
+// Single place where all dependencies are configured
+export function createDIContainer(db: Db): AwilixContainer {
+  const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
+
+  container.register({
+    // Database
+    db: asValue(db),
+
+    // Repositories (registered once, used everywhere)
+    projectRepository: asClass(ProjectRepository).singleton(),
+    taskRepository: asClass(TaskRepository).singleton(),
+    labelRepository: asClass(LabelRepository).singleton(),
+
+    // Use Cases
+    createProjectUseCase: asClass(CreateProjectUseCase).singleton(),
+    // ... all other use cases
+  });
+
+  return container;
+}
+```
+
+#### When NOT to Apply DRY
+
+DRY is about **knowledge**, not just code. Sometimes similar-looking code represents different knowledge.
+
+**✅ Example: Separate Validation in Different Layers**
+
+```typescript
+// Domain Layer: Business rule validation
+// src/domain/entities/task.entity.ts
+private validate(): void {
+  if (!this.props.title.trim()) {
+    throw new ValidationError('Task title cannot be empty');
+  }
+  // This is BUSINESS KNOWLEDGE
+}
+
+// Interface Layer: Input format validation
+// src/interfaces/http/dtos/task.dto.ts
+export const CreateTaskBodySchema = Type.Object({
+  title: Type.String({ minLength: 1, maxLength: 200 }),
+  // This is INPUT FORMAT KNOWLEDGE (different from business rules!)
+});
+```
+
+These look similar but represent different concerns:
+- **Domain validation**: Business rules that must ALWAYS be true
+- **DTO validation**: HTTP input format requirements
+
+**They should remain separate** even though they both validate the title!
+
+---
+
+### How Clean Architecture, SOLID, and DRY Work Together
+
+These principles reinforce each other:
+
+```mermaid
+graph TB
+    CA[Clean Architecture<br/>Separates layers]
+    SRP[Single Responsibility<br/>Each class does one thing]
+    OCP[Open/Closed<br/>Extend without modification]
+    LSP[Liskov Substitution<br/>Interchangeable implementations]
+    ISP[Interface Segregation<br/>Focused interfaces]
+    DIP[Dependency Inversion<br/>Depend on abstractions]
+    DRY[Don't Repeat Yourself<br/>Single source of truth]
+    
+    CA -->|enforces| SRP
+    CA -->|enforces| DIP
+    DIP -->|enables| LSP
+    DIP -->|enables| OCP
+    ISP -->|supports| SRP
+    DRY -->|complements| SRP
+    
+    style CA fill:#4ade80,stroke:#22c55e,stroke-width:3px,color:#000
+    style DIP fill:#60a5fa,stroke:#3b82f6,stroke-width:2px,color:#000
+    style SRP fill:#f472b6,stroke:#ec4899,color:#000
+    style OCP fill:#fbbf24,stroke:#f59e0b,color:#000
+    style LSP fill:#a78bfa,stroke:#8b5cf6,color:#000
+    style ISP fill:#fb923c,stroke:#f97316,color:#000
+    style DRY fill:#38bdf8,stroke:#0ea5e9,color:#000
+```
+
+**Real Example: Adding a New Feature**
+
+Let's say we want to add task comments. Here's how the principles guide us:
+
+1. **SRP**: Create a `Comment` entity (single responsibility: represent a comment)
+2. **DRY**: Extend `Entity<CommentProps>` to reuse ID and equality logic
+3. **DIP**: Create `CommentRepositoryPort` interface
+4. **ISP**: Keep interface focused - only comment operations
+5. **OCP**: Implement `MongoCommentRepository` without modifying existing code
+6. **LSP**: Any `CommentRepositoryPort` implementation works
+7. **Clean Architecture**: 
+   - Domain: `Comment` entity
+   - Application: `AddCommentUseCase`
+   - Infrastructure: `MongoCommentRepository`
+   - Interface: `POST /api/tasks/:id/comments`
+
+**The result?** A feature added with:
+- ✅ Zero changes to existing entities
+- ✅ Zero changes to existing repositories
+- ✅ Zero changes to existing use cases
+- ✅ Fully testable
+- ✅ Easy to maintain
+
+
 
 ---
 
@@ -57,10 +887,10 @@ graph TB
     Infrastructure -->|implements| Application
     Infrastructure -->|depends on| Domain
     
-    style Domain fill:#4ade80,stroke:#22c55e,stroke-width:3px
-    style Application fill:#60a5fa,stroke:#3b82f6,stroke-width:2px
-    style Infrastructure fill:#fbbf24,stroke:#f59e0b,stroke-width:2px
-    style Interface fill:#f472b6,stroke:#ec4899,stroke-width:2px
+    style Domain fill:#4ade80,stroke:#22c55e,stroke-width:3px,color:#000
+    style Application fill:#60a5fa,stroke:#3b82f6,stroke-width:2px,color:#000
+    style Infrastructure fill:#fbbf24,stroke:#f59e0b,stroke-width:2px,color:#000
+    style Interface fill:#f472b6,stroke:#ec4899,stroke-width:2px,color:#000
 ```
 
 ### Path Aliases
@@ -103,9 +933,9 @@ graph LR
     E --> ER
     E --> T
     
-    style E fill:#86efac,stroke:#22c55e
-    style ER fill:#fca5a5,stroke:#ef4444
-    style T fill:#bae6fd,stroke:#0ea5e9
+    style E fill:#86efac,stroke:#22c55e,color:#000
+    style ER fill:#fca5a5,stroke:#ef4444,color:#000
+    style T fill:#bae6fd,stroke:#0ea5e9,color:#000
 ```
 
 **Components:**
@@ -159,8 +989,8 @@ graph TB
     
     UC -->|depends on| P
     
-    style UC fill:#93c5fd,stroke:#3b82f6
-    style P fill:#d1d5db,stroke:#6b7280
+    style UC fill:#93c5fd,stroke:#3b82f6,color:#000
+    style P fill:#d1d5db,stroke:#6b7280,color:#000
 ```
 
 **Components:**
@@ -214,9 +1044,9 @@ graph LR
     R -->|uses| M
     R -->|talks to| DB
     
-    style R fill:#fde047,stroke:#eab308
-    style M fill:#a78bfa,stroke:#8b5cf6
-    style DB fill:#cbd5e1,stroke:#64748b
+    style R fill:#fde047,stroke:#eab308,color:#000
+    style M fill:#a78bfa,stroke:#8b5cf6,color:#000
+    style DB fill:#cbd5e1,stroke:#64748b,color:#000
 ```
 
 **Components:**
@@ -268,10 +1098,10 @@ graph TB
     R -->|calls| UC
     R -->|protected by| M
     
-    style R fill:#f9a8d4,stroke:#ec4899
-    style D fill:#c7d2fe,stroke:#6366f1
-    style M fill:#fed7aa,stroke:#fb923c
-    style UC fill:#93c5fd,stroke:#3b82f6
+    style R fill:#f9a8d4,stroke:#ec4899,color:#000
+    style D fill:#c7d2fe,stroke:#6366f1,color:#000
+    style M fill:#fed7aa,stroke:#fb923c,color:#000
+    style UC fill:#93c5fd,stroke:#3b82f6,color:#000
 ```
 
 **Components:**
@@ -402,9 +1232,9 @@ graph TB
     Route -->|Resolves| UseCase[Use Case Instance]
     UseCase -->|Has| Repo[Repository Instance]
     
-    style Container fill:#fde68a,stroke:#f59e0b
-    style UseCase fill:#93c5fd,stroke:#3b82f6
-    style Repo fill:#fde047,stroke:#eab308
+    style Container fill:#fde68a,stroke:#f59e0b,color:#000
+    style UseCase fill:#93c5fd,stroke:#3b82f6,color:#000
+    style Repo fill:#fde047,stroke:#eab308,color:#000
 ```
 
 ---
@@ -1097,9 +1927,9 @@ graph TB
     E2E --> Integration
     Integration --> Unit
     
-    style E2E fill:#fca5a5,stroke:#ef4444
-    style Integration fill:#fde68a,stroke:#f59e0b
-    style Unit fill:#86efac,stroke:#22c55e
+    style E2E fill:#fca5a5,stroke:#ef4444,color:#000
+    style Integration fill:#fde68a,stroke:#f59e0b,color:#000
+    style Unit fill:#86efac,stroke:#22c55e,color:#000
 ```
 
 ### Test Distribution

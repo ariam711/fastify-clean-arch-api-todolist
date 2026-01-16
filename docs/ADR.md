@@ -171,14 +171,15 @@ Need consistent error handling across the application with proper HTTP status co
 Implement **typed domain errors** with centralized HTTP mapping.
 
 **Error Types:**
-| Domain Error | HTTP Status |
-|--------------|-------------|
-| ValidationError | 400 |
-| NotFoundError | 404 |
-| ConflictError | 409 |
-| BusinessRuleViolationError | 422 |
-| DomainError (generic) | 400 |
-| Unknown | 500 |
+
+| Domain Error               | HTTP Status |
+|:---------------------------|:-----------:|
+| ValidationError            |     400     |
+| DomainError (generic)      |     400     |
+| NotFoundError              |     404     |
+| ConflictError              |     409     |
+| BusinessRuleViolationError |     422     |
+| Unknown                    |     500     |
 
 **Rationale:**
 - **Type safety**: Errors carry structured information
