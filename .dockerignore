@@ -1,0 +1,13 @@
+# .dockerignore
+node_modules
+dist
+coverage
+.git
+.github
+.vscode
+*.md
+*.log
+.env*
+!.env.example
+tests
+docs

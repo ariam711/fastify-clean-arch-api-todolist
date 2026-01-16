@@ -1,10 +1,12 @@
 # TODO List REST API
 
+[![CI](https://github.com/YOUR_USERNAME/fastify-clean-arch-api-todolist/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/fastify-clean-arch-api-todolist/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Production-ready TODO List REST API built with **Fastify + MongoDB** using **Clean Architecture**, **SOLID**, and **DRY** principles.
 
 > [!TIP]
 > **New to the project?** Check out our comprehensive [Architecture Guide](./docs/ARCHITECTURE_GUIDE.md) for a deep dive into the design principles, request flows, and a step-by-step tutorial on adding new features.
-
 
 ## Features
 
@@ -17,6 +19,9 @@ Production-ready TODO List REST API built with **Fastify + MongoDB** using **Cle
 - ✅ Comprehensive test suite (>85% coverage target)
 - ✅ Request correlation IDs for tracing
 - ✅ Typed error handling with HTTP mapping
+- ✅ CI/CD with GitHub Actions
+- ✅ Docker support with multi-stage builds
+
 
 ## Tech Stack
 
