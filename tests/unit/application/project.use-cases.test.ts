@@ -7,11 +7,7 @@ import { DeleteProjectUseCase } from '../../../src/application/use-cases/project
 import { GetProjectUseCase } from '../../../src/application/use-cases/project/get-project.use-case.js';
 import { ListProjectsUseCase } from '../../../src/application/use-cases/project/list-projects.use-case.js';
 import { UpdateProjectUseCase } from '../../../src/application/use-cases/project/update-project.use-case.js';
-import {
-  BusinessRuleViolationError,
-  ConflictError,
-  NotFoundError,
-} from '../../../src/domain/errors/domain-errors.js';
+import { BusinessRuleViolationError, ConflictError, NotFoundError } from '../../../src/domain/errors/domain-errors.js';
 import { createProject } from '../../helpers/test-builders.js';
 
 const createMockProjectRepository = (): ProjectRepositoryPort => ({
@@ -118,9 +114,7 @@ describe('Project Use Cases', () => {
 
       const useCase = new UpdateProjectUseCase(projectRepository);
 
-      await expect(useCase.execute({ id: 'non-existent', name: 'New' })).rejects.toThrow(
-        NotFoundError,
-      );
+      await expect(useCase.execute({ id: 'non-existent', name: 'New' })).rejects.toThrow(NotFoundError);
     });
 
     it('should throw ConflictError when new name already exists', async () => {
@@ -131,9 +125,7 @@ describe('Project Use Cases', () => {
 
       const useCase = new UpdateProjectUseCase(projectRepository);
 
-      await expect(useCase.execute({ id: 'proj-1', name: 'Existing' })).rejects.toThrow(
-        ConflictError,
-      );
+      await expect(useCase.execute({ id: 'proj-1', name: 'Existing' })).rejects.toThrow(ConflictError);
     });
   });
 

@@ -35,10 +35,7 @@ export class LabelRepository implements LabelRepositoryPort {
     return doc ? LabelMapper.toDomain(doc) : null;
   }
 
-  async findByProjectId(
-    projectId: string,
-    pagination: OffsetPaginationParams,
-  ): Promise<OffsetPaginatedResult<Label>> {
+  async findByProjectId(projectId: string, pagination: OffsetPaginationParams): Promise<OffsetPaginatedResult<Label>> {
     const { limit, offset } = pagination;
 
     const [docs, total] = await Promise.all([

@@ -111,10 +111,7 @@ export class LabelBuilder {
 }
 
 // Factory functions for quick creation
-export const createProject = (
-  overrides?: Partial<{ name: string; description?: string }>,
-  id?: string,
-) => {
+export const createProject = (overrides?: Partial<{ name: string; description?: string }>, id?: string) => {
   const builder = new ProjectBuilder();
   if (overrides?.name) builder.withName(overrides.name);
   if (overrides?.description !== undefined) builder.withDescription(overrides.description);
@@ -144,10 +141,7 @@ export const createTask = (
   return builder.build(id);
 };
 
-export const createLabel = (
-  overrides?: Partial<{ name: string; color: string; projectId: string }>,
-  id?: string,
-) => {
+export const createLabel = (overrides?: Partial<{ name: string; color: string; projectId: string }>, id?: string) => {
   const builder = new LabelBuilder();
   if (overrides?.name) builder.withName(overrides.name);
   if (overrides?.color) builder.withColor(overrides.color);

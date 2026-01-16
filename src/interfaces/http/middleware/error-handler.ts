@@ -16,11 +16,7 @@ interface ErrorResponse {
   };
 }
 
-export function errorHandler(
-  error: FastifyError | Error,
-  request: FastifyRequest,
-  reply: FastifyReply,
-): void {
+export function errorHandler(error: FastifyError | Error, request: FastifyRequest, reply: FastifyReply): void {
   const correlationId = request.headers['x-correlation-id'] ?? request.id;
 
   request.log.error({
@@ -106,8 +102,7 @@ export function errorHandler(
   reply.status(500).send({
     error: {
       code: 'INTERNAL_SERVER_ERROR',
-      message:
-        process.env['NODE_ENV'] === 'production' ? 'An unexpected error occurred' : error.message,
+      message: process.env['NODE_ENV'] === 'production' ? 'An unexpected error occurred' : error.message,
     },
   } satisfies ErrorResponse);
 }

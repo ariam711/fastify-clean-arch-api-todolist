@@ -52,17 +52,11 @@ describe('Label Entity', () => {
     });
 
     it('should throw ValidationError for invalid color format', () => {
-      expect(() => Label.create({ name: 'Test', color: 'red', projectId: 'p1' })).toThrow(
-        ValidationError,
-      );
+      expect(() => Label.create({ name: 'Test', color: 'red', projectId: 'p1' })).toThrow(ValidationError);
 
-      expect(() => Label.create({ name: 'Test', color: '#ff', projectId: 'p1' })).toThrow(
-        ValidationError,
-      );
+      expect(() => Label.create({ name: 'Test', color: '#ff', projectId: 'p1' })).toThrow(ValidationError);
 
-      expect(() => Label.create({ name: 'Test', color: '#gggggg', projectId: 'p1' })).toThrow(
-        ValidationError,
-      );
+      expect(() => Label.create({ name: 'Test', color: '#gggggg', projectId: 'p1' })).toThrow(ValidationError);
     });
 
     it('should accept valid hex colors', () => {

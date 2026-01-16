@@ -62,17 +62,11 @@ export class Task extends Entity<TaskProps> {
     }
 
     if (input.status && !TASK_STATUSES.includes(input.status)) {
-      throw new ValidationError(
-        `Invalid status. Must be one of: ${TASK_STATUSES.join(', ')}`,
-        'status',
-      );
+      throw new ValidationError(`Invalid status. Must be one of: ${TASK_STATUSES.join(', ')}`, 'status');
     }
 
     if (input.priority && !TASK_PRIORITIES.includes(input.priority)) {
-      throw new ValidationError(
-        `Invalid priority. Must be one of: ${TASK_PRIORITIES.join(', ')}`,
-        'priority',
-      );
+      throw new ValidationError(`Invalid priority. Must be one of: ${TASK_PRIORITIES.join(', ')}`, 'priority');
     }
 
     if (input.dueDate && input.dueDate < new Date()) {
@@ -166,10 +160,7 @@ export class Task extends Entity<TaskProps> {
 
     if (input.priority !== undefined) {
       if (!TASK_PRIORITIES.includes(input.priority)) {
-        throw new ValidationError(
-          `Invalid priority. Must be one of: ${TASK_PRIORITIES.join(', ')}`,
-          'priority',
-        );
+        throw new ValidationError(`Invalid priority. Must be one of: ${TASK_PRIORITIES.join(', ')}`, 'priority');
       }
       this.props.priority = input.priority;
     }
@@ -191,10 +182,7 @@ export class Task extends Entity<TaskProps> {
 
   private transitionStatus(newStatus: TaskStatus): void {
     if (!TASK_STATUSES.includes(newStatus)) {
-      throw new ValidationError(
-        `Invalid status. Must be one of: ${TASK_STATUSES.join(', ')}`,
-        'status',
-      );
+      throw new ValidationError(`Invalid status. Must be one of: ${TASK_STATUSES.join(', ')}`, 'status');
     }
 
     if (this.props.status === newStatus) {

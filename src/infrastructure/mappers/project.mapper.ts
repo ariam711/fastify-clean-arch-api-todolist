@@ -9,6 +9,7 @@ export interface ProjectDocument extends Document {
   updatedAt: Date;
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Mapper pattern
 export class ProjectMapper {
   static toDocument(project: Project): ProjectDocument {
     return {

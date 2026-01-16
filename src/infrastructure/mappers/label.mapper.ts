@@ -9,6 +9,7 @@ export interface LabelDocument extends Document {
   createdAt: Date;
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Mapper pattern
 export class LabelMapper {
   static toDocument(label: Label): LabelDocument {
     return {

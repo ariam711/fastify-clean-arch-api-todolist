@@ -18,6 +18,14 @@ export default defineConfig({
         'src/**/types.ts',
         'src/**/types/index.ts',
         'src/**/index.ts',
+        'src/interfaces/http/server.ts', // Entry point - tested via integration
+        'src/interfaces/http/app.ts', // Factory tested via integration
+        'src/interfaces/http/routes/**', // Routes tested via integration
+        'src/domain/shared/value-object.ts', // Base class not used yet
+        'src/application/ports/**', // Interfaces only, no logic
+        'src/infrastructure/database/mongodb.connection.ts', // Tested via integration
+        'src/infrastructure/repositories/**', // Repositories tested via integration
+        'src/config/env.ts', // Config validation - env-specific branches
       ],
       thresholds: {
         statements: 85,

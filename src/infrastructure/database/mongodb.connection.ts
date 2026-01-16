@@ -57,9 +57,7 @@ async function createIndexes(database: Db): Promise<void> {
   await database.collection('tasks').createIndex({ dueDate: 1 });
   await database.collection('tasks').createIndex({ labelIds: 1 });
   await database.collection('tasks').createIndex({ createdAt: -1 });
-  await database
-    .collection('tasks')
-    .createIndex({ title: 'text', description: 'text' }, { name: 'task_text_search' });
+  await database.collection('tasks').createIndex({ title: 'text', description: 'text' }, { name: 'task_text_search' });
 
   // Label indexes
   await database.collection('labels').createIndex({ projectId: 1 });

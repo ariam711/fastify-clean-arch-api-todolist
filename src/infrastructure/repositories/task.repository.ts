@@ -48,8 +48,7 @@ export class TaskRepository implements TaskRepositoryPort {
     const data = hasMore ? docs.slice(0, limit) : docs;
 
     const lastItem = data[data.length - 1];
-    const nextCursor =
-      hasMore && lastItem ? this.encodeCursor(lastItem._id, lastItem.createdAt) : undefined;
+    const nextCursor = hasMore && lastItem ? this.encodeCursor(lastItem._id, lastItem.createdAt) : undefined;
 
     return {
       data: data.map(TaskMapper.toDomain),
@@ -155,9 +154,7 @@ export class TaskRepository implements TaskRepositoryPort {
   }
 
   private encodeCursor(id: string, createdAt: Date): string {
-    return Buffer.from(JSON.stringify({ id, createdAt: createdAt.toISOString() })).toString(
-      'base64',
-    );
+    return Buffer.from(JSON.stringify({ id, createdAt: createdAt.toISOString() })).toString('base64');
   }
 
   private decodeCursor(cursor: string): { id: string; createdAt: Date } {

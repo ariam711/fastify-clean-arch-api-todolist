@@ -1,8 +1,4 @@
-export type DomainErrorCode =
-  | 'VALIDATION_ERROR'
-  | 'NOT_FOUND'
-  | 'CONFLICT'
-  | 'BUSINESS_RULE_VIOLATION';
+export type DomainErrorCode = 'VALIDATION_ERROR' | 'NOT_FOUND' | 'CONFLICT' | 'BUSINESS_RULE_VIOLATION';
 
 export abstract class DomainError extends Error {
   abstract readonly code: DomainErrorCode;

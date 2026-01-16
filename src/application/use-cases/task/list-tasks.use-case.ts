@@ -1,10 +1,5 @@
 import type { Task } from '../../../domain/entities/task.entity.js';
-import type {
-  PaginatedResult,
-  SortParams,
-  TaskPriority,
-  TaskStatus,
-} from '../../../domain/types/index.js';
+import type { PaginatedResult, SortParams, TaskPriority, TaskStatus } from '../../../domain/types/index.js';
 import type { TaskFilterParams, TaskRepositoryPort } from '../../ports/task.repository.port.js';
 
 export interface ListTasksQuery {

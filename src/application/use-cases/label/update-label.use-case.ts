@@ -20,16 +20,9 @@ export class UpdateLabelUseCase {
 
     // Check for duplicate label name within the project
     if (command.name && command.name.trim() !== label.name) {
-      const existingLabel = await this.labelRepository.findByName(
-        command.name.trim(),
-        label.projectId,
-      );
+      const existingLabel = await this.labelRepository.findByName(command.name.trim(), label.projectId);
       if (existingLabel && existingLabel.id !== label.id) {
-        throw new ConflictError(
-          'Label',
-          'name',
-          'A label with this name already exists in this project',
-        );
+        throw new ConflictError('Label', 'name', 'A label with this name already exists in this project');
       }
     }
 

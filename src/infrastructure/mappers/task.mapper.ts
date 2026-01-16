@@ -15,6 +15,7 @@ export interface TaskDocument extends Document {
   updatedAt: Date;
 }
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Mapper pattern
 export class TaskMapper {
   static toDocument(task: Task): TaskDocument {
     return {

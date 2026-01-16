@@ -19,13 +19,7 @@ import {
 } from '../dtos/label.dto.js';
 import { type IdParams, IdParamsSchema } from '../dtos/project.dto.js';
 
-function formatLabelResponse(label: {
-  id: string;
-  name: string;
-  color: string;
-  projectId: string;
-  createdAt: Date;
-}) {
+function formatLabelResponse(label: { id: string; name: string; color: string; projectId: string; createdAt: Date }) {
   return {
     id: label.id,
     name: label.name,

@@ -160,11 +160,7 @@ export async function taskRoutes(app: FastifyInstance): Promise<void> {
         status: request.body.status,
         priority: request.body.priority,
         dueDate:
-          request.body.dueDate === null
-            ? null
-            : request.body.dueDate
-              ? new Date(request.body.dueDate)
-              : undefined,
+          request.body.dueDate === null ? null : request.body.dueDate ? new Date(request.body.dueDate) : undefined,
         labelIds: request.body.labelIds,
       });
       return reply.send(formatTaskResponse(task));

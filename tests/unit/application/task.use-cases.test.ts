@@ -76,9 +76,7 @@ describe('Task Use Cases', () => {
 
       const useCase = new CreateTaskUseCase(taskRepository, projectRepository, labelRepository);
 
-      await expect(useCase.execute({ title: 'Task', projectId: 'non-existent' })).rejects.toThrow(
-        NotFoundError,
-      );
+      await expect(useCase.execute({ title: 'Task', projectId: 'non-existent' })).rejects.toThrow(NotFoundError);
     });
 
     it('should throw NotFoundError when label does not exist', async () => {
@@ -101,9 +99,9 @@ describe('Task Use Cases', () => {
 
       const useCase = new CreateTaskUseCase(taskRepository, projectRepository, labelRepository);
 
-      await expect(
-        useCase.execute({ title: 'Task', projectId: 'proj-1', labelIds: ['label-1'] }),
-      ).rejects.toThrow(NotFoundError);
+      await expect(useCase.execute({ title: 'Task', projectId: 'proj-1', labelIds: ['label-1'] })).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -129,16 +127,30 @@ describe('Task Use Cases', () => {
   });
 
   describe('UpdateTaskUseCase', () => {
-    it('should update task successfully', async () => {
+    it('should update task successfully without labels', async () => {
       const task = createTask({ title: 'Original', projectId: 'proj-1' }, 'task-1');
       vi.mocked(taskRepository.findById).mockResolvedValue(task);
-      vi.mocked(labelRepository.findByIds).mockResolvedValue([]);
       vi.mocked(taskRepository.update).mockImplementation(async (t) => t);
 
       const useCase = new UpdateTaskUseCase(taskRepository, labelRepository);
       const result = await useCase.execute({ id: 'task-1', title: 'Updated' });
 
       expect(result.title).toBe('Updated');
+      expect(labelRepository.findByIds).not.toHaveBeenCalled();
+    });
+
+    it('should update task with valid labels', async () => {
+      const task = createTask({ title: 'Original', projectId: 'proj-1' }, 'task-1');
+      const label = createLabel({ name: 'Bug', projectId: 'proj-1' }, 'label-1');
+      vi.mocked(taskRepository.findById).mockResolvedValue(task);
+      vi.mocked(labelRepository.findByIds).mockResolvedValue([label]);
+      vi.mocked(taskRepository.update).mockImplementation(async (t) => t);
+
+      const useCase = new UpdateTaskUseCase(taskRepository, labelRepository);
+      const result = await useCase.execute({ id: 'task-1', labelIds: ['label-1'] });
+
+      expect(result).toBeDefined();
+      expect(labelRepository.findByIds).toHaveBeenCalledWith(['label-1']);
     });
 
     it('should throw NotFoundError when task not found', async () => {
@@ -146,9 +158,40 @@ describe('Task Use Cases', () => {
 
       const useCase = new UpdateTaskUseCase(taskRepository, labelRepository);
 
-      await expect(useCase.execute({ id: 'non-existent', title: 'New' })).rejects.toThrow(
-        NotFoundError,
-      );
+      await expect(useCase.execute({ id: 'non-existent', title: 'New' })).rejects.toThrow(NotFoundError);
+    });
+
+    it('should throw NotFoundError when label does not exist', async () => {
+      const task = createTask({ title: 'Original', projectId: 'proj-1' }, 'task-1');
+      vi.mocked(taskRepository.findById).mockResolvedValue(task);
+      vi.mocked(labelRepository.findByIds).mockResolvedValue([]); // Empty - label not found
+
+      const useCase = new UpdateTaskUseCase(taskRepository, labelRepository);
+
+      await expect(useCase.execute({ id: 'task-1', labelIds: ['non-existent'] })).rejects.toThrow(NotFoundError);
+    });
+
+    it('should throw NotFoundError when label belongs to different project', async () => {
+      const task = createTask({ title: 'Original', projectId: 'proj-1' }, 'task-1');
+      const label = createLabel({ name: 'Bug', projectId: 'proj-2' }, 'label-1'); // Different project
+      vi.mocked(taskRepository.findById).mockResolvedValue(task);
+      vi.mocked(labelRepository.findByIds).mockResolvedValue([label]);
+
+      const useCase = new UpdateTaskUseCase(taskRepository, labelRepository);
+
+      await expect(useCase.execute({ id: 'task-1', labelIds: ['label-1'] })).rejects.toThrow(NotFoundError);
+    });
+
+    it('should update task with empty label array', async () => {
+      const task = createTask({ title: 'Original', projectId: 'proj-1' }, 'task-1');
+      vi.mocked(taskRepository.findById).mockResolvedValue(task);
+      vi.mocked(taskRepository.update).mockImplementation(async (t) => t);
+
+      const useCase = new UpdateTaskUseCase(taskRepository, labelRepository);
+      const result = await useCase.execute({ id: 'task-1', labelIds: [] });
+
+      expect(result).toBeDefined();
+      expect(labelRepository.findByIds).not.toHaveBeenCalled();
     });
   });
 

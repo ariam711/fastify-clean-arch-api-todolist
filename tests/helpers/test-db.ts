@@ -22,9 +22,7 @@ export async function startTestDatabase(): Promise<Db> {
   await db.collection('projects').createIndex({ name: 1 }, { unique: true });
   await db.collection('tasks').createIndex({ projectId: 1 });
   await db.collection('tasks').createIndex({ status: 1 });
-  await db
-    .collection('tasks')
-    .createIndex({ title: 'text', description: 'text' }, { name: 'task_text_search' });
+  await db.collection('tasks').createIndex({ title: 'text', description: 'text' }, { name: 'task_text_search' });
   await db.collection('labels').createIndex({ projectId: 1 });
   await db.collection('labels').createIndex({ name: 1, projectId: 1 }, { unique: true });
 
